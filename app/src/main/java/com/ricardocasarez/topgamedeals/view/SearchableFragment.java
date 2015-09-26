@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -175,13 +176,15 @@ public class SearchableFragment extends Fragment implements
             HttpRequest.doAsyncHTTPRequest(url, new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
-                    new Handler().post(new Runnable() {
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
                             if (mErrorTextView != null) {
                                 mErrorTextView.setText(R.string.error_connection);
                                 mErrorTextView.setVisibility(View.VISIBLE);
                             }
+                            if (mProgressBar != null)
+                                mProgressBar.setVisibility(View.GONE);
                         }
                     });
                 }

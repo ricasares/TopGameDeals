@@ -26,7 +26,7 @@ public class SearchableActivity extends AppCompatActivity implements FragmentInt
         setContentView(R.layout.activity_searchable);
 
         // set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_elevated);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.activity_searchable_title);
@@ -34,6 +34,13 @@ public class SearchableActivity extends AppCompatActivity implements FragmentInt
 
         handleIntent(getIntent());
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
 
     /**
      * Handles an Intent that can perform ACTION_VIEW or ACTION_SEARCH.
@@ -55,7 +62,7 @@ public class SearchableActivity extends AppCompatActivity implements FragmentInt
             if (fg == null) {
                 fg = SearchableFragment.newInstance(query);
                 getSupportFragmentManager().beginTransaction().
-                        add(R.id.fragment_container, fg, SearchableFragment.TAG)
+                        replace(R.id.fragment_container, fg, SearchableFragment.TAG)
                         .commit();
             }
         } else if (intent != null && intent.getAction() == Intent.ACTION_VIEW) {

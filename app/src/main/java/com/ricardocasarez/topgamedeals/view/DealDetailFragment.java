@@ -1,5 +1,7 @@
 package com.ricardocasarez.topgamedeals.view;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -111,10 +113,16 @@ public class DealDetailFragment extends DialogFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
 
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_STORE_ID);
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        setHasOptionsMenu(false);
+        return super.onCreateDialog(savedInstanceState);
     }
 
     @Override

@@ -3,114 +3,125 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        >
-        <!-- Left panel -->
-        <LinearLayout
-            android:layout_width="0dp"
+        android:layout_height="match_parent">
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            >
-            <ImageView
-                android:id="@+id/imageview_art"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/textview_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-            <TextView
-                android:id="@+id/textview_store"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceLarge"
-                />
-            <TextView
-                android:id="@+id/textview_release_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:paddingTop="10dp"
-                />
-        </LinearLayout>
-
-        <!-- Right panel -->
+            android:layout_gravity="center"
+            android:indeterminate="true"/>
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
+            android:id="@+id/details_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
             android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             >
-            <TextView
-                android:id="@+id/textview_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="30sp"
-                />
+            <!-- Left panel -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:orientation="vertical"
                 >
+                <ImageView
+                    android:id="@+id/imageview_art"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
                 <TextView
-                    android:id="@+id/textview_savings"
+                    android:id="@+id/textview_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/accent"
                     android:textAppearance="?android:textAppearanceLarge"
                     android:fontFamily="sans-serif-medium"
-                    android:paddingRight="16dp"
-                    />
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
                 <TextView
-                    android:id="@+id/textview_old_price"
+                    android:id="@+id/textview_store"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:textAppearanceLarge"
                     />
+                <TextView
+                    android:id="@+id/textview_release_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:paddingTop="10dp"
+                    />
             </LinearLayout>
-            <RatingBar
-                android:id="@+id/rating_bar"
-                android:layout_width="wrap_content"
+
+            <!-- Right panel -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:numStars="5"
-                android:stepSize=".1"
-                style="?android:attr/ratingBarStyleIndicator"
-                />
-            <TextView
-                android:id="@+id/textview_metacritic_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:fontFamily="sans-serif-medium"
-                />
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/button_metacritic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/go_metacritic"
-                android:layout_marginTop="20dp"
-                />
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/button_store"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/go_store"
-                />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                >
+                <TextView
+                    android:id="@+id/textview_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="30sp"
+                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:id="@+id/textview_savings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/accent"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:fontFamily="sans-serif-medium"
+                        android:paddingRight="16dp"
+                        />
+                    <TextView
+                        android:id="@+id/textview_old_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        />
+                </LinearLayout>
+                <RatingBar
+                    android:id="@+id/rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize=".1"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    />
+                <TextView
+                    android:id="@+id/textview_metacritic_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:fontFamily="sans-serif-medium"
+                    />
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/button_metacritic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/go_metacritic"
+                    android:layout_marginTop="20dp"
+                    />
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/button_store"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/go_store"
+                    />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </ScrollView>
