@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#8BC34A</color>
+    <color name="primary_dark">#33691E</color>
+    <color name="accent">#FF00FF</color>
+
+
+
+    <color name="background_light_theme">#FAFAFA</color>
+    <color name="list_background">#EEEEEE</color>
+</resources>

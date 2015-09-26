@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_share"
+        android:title="share"
+        app:showAsAction="always"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        />
+    <item android:id="@+id/action_add_alert"
+        android:title="add alert"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_add_alert_white_24dp"
+        />
+</menu>

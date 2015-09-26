@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="is_large_screen">false</bool>
+    <!-- Alias for RecyclerView item layout -->
+    <item type="layout" name="game_deal_item_layout">@layout/item_row_deals</item>
+    <item type="layout" name="deal_detail">@layout/fragment_deal_detail</item>
+</resources>

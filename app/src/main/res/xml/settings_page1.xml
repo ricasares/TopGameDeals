@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="@string/pref_notifications_key"
+        android:title="@string/pref_notifications_title"
+        android:defaultValue="@string/pref_notifications_default"
+        android:summaryOn="@string/pref_notifications_summary_on"
+        android:summaryOff="@string/pref_notifications_summary_off"
+        />
+    <CheckBoxPreference
+        android:key="@string/pref_aaa_key"
+        android:title="@string/pref_aaa_title"
+        android:defaultValue="@string/pref_aaa_default"
+        android:summaryOn="@string/pref_aaa_summary_on"
+        android:summaryOff="@string/pref_aaa_summary_off"
+        />
+    <CheckBoxPreference
+        android:key="@string/pref_metacritic_key"
+        android:title="@string/pref_metacritic_title"
+        android:summary="@string/pref_metacritic_summary"
+        android:defaultValue="@string/pref_metacritic_default"
+        />
+    <EditTextPreference
+        android:key="@string/pref_metacritic_edit_key"
+        android:dialogTitle="@string/pref_metacritic_edit_dialog_title"
+        android:title="@string/pref_metacritic_edit_title"
+        android:defaultValue="@string/pref_metacritic_edit_default"
+        android:dependency="@string/pref_metacritic_key"
+        android:inputType="number"
+        />
+    <EditTextPreference
+        android:key="@string/pref_email_edit_key"
+        android:dialogTitle="@string/pref_email_edit_dialog_title"
+        android:title="@string/pref_email_edit_title"
+        android:defaultValue="@string/pref_email_edit_default"
+        android:inputType="textEmailAddress"
+        android:summary="@string/pref_email_edit_summary"
+        />
+</PreferenceScreen>
