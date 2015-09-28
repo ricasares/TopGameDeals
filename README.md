@@ -7,6 +7,12 @@ The application takes advantage of Android sync framework and Content Providers 
 It also support search and price alert features of CheapShark API.
 
 ###Pre-requisites
+- Android SDK v23
+- Android Build Toolsv23
+- Android Support Repository
+
+###Getting Started
+The sample uses the Gradle build system. To build this project, import project in Android Studio.
 Add KEYSTORE_PASSWORD and KEY_PASSWORD to gradle.properties.
 Set app gradle.build key path in storeFile.
 
@@ -18,6 +24,10 @@ Set app gradle.build key path in storeFile.
 - gson 2.3.1
 
 ###ScreenShoots
+![Main Screen](/screenshots/MainScreen.png)
+![Detail Screen](/screenshots/Details.png)
+![Settings Screen](/screenshots/Settings.png)
+![Main Screen Landscape](/screenshots/MainScreen-landscape.png)
 
 ###Knonkn issues.
 - v7.PreferenceFragmentCompat. Bigger font issue.
