@@ -86,7 +86,7 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
             if (storesResponse != null && storesResponse.isSuccessful()) {
                 getStoreDataFromJson(storesResponse.body().string());
             } else {
-                Log.e(LOG_TAG, storesResponse.message());
+                Log.e(LOG_TAG, storesResponse.message() + " : " + storesResponse.code());
                 return;
             }
 

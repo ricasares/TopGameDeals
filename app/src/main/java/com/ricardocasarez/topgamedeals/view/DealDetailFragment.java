@@ -1,15 +1,12 @@
 package com.ricardocasarez.topgamedeals.view;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
@@ -40,13 +37,9 @@ import com.ricardocasarez.topgamedeals.MainActivity;
 import com.ricardocasarez.topgamedeals.R;
 import com.ricardocasarez.topgamedeals.data.DealsContract;
 import com.ricardocasarez.topgamedeals.model.GameDeal;
-import com.ricardocasarez.topgamedeals.utils.HttpRequest;
-import com.squareup.okhttp.Response;
+import com.ricardocasarez.topgamedeals.service.DealsAlertService;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -61,7 +54,8 @@ public class DealDetailFragment extends DialogFragment implements
     private static final String LOG_TAG = DealDetailFragment.class.getSimpleName();
     public static final String TAG = DealDetailFragment.class.getSimpleName();
     private static final int LOADER_ID = 300;
-    private static final int LOADER_STORE_ID = 301;
+    private static final int LOADER_ID_STORE = 301;
+    private static final int LOADER_ID_ALERT = 302;
     private static final String DATE_FORMAT = "MMMM d, yyyy";
     private static final String TIME_ZONE = "UTC";
 
@@ -96,6 +90,7 @@ public class DealDetailFragment extends DialogFragment implements
     private String mStore;
     // current deal uri
     private Uri mDealUri;
+    private boolean mHasPriceAlert;
 
     /**
      * Creates an instance of DealDetailFragment with GameDeal as argument.
@@ -116,7 +111,8 @@ public class DealDetailFragment extends DialogFragment implements
         setHasOptionsMenu(true);
 
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
-        getActivity().getSupportLoaderManager().destroyLoader(LOADER_STORE_ID);
+        getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID_STORE);
+        getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID_ALERT);
     }
 
     @Override
@@ -173,6 +169,9 @@ public class DealDetailFragment extends DialogFragment implements
 
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_details, menu);
+        if (mHasPriceAlert) {
+            menu.removeItem(R.id.action_add_alert);
+        }
 
         // Locate MenuItem with ShareActionProvider
         MenuItem item = menu.findItem(R.id.action_share);
@@ -194,6 +193,14 @@ public class DealDetailFragment extends DialogFragment implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu){
+        if (mHasPriceAlert) {
+            menu.removeItem(R.id.action_add_alert);
+        }
+        super.onPrepareOptionsMenu(menu);
     }
 
     /**
@@ -220,7 +227,8 @@ public class DealDetailFragment extends DialogFragment implements
                     getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
                 } else {
                     // query store name
-                    getActivity().getSupportLoaderManager().initLoader(LOADER_STORE_ID, null, this);
+                    getActivity().getSupportLoaderManager().initLoader(LOADER_ID_STORE, null, this);
+                    getActivity().getSupportLoaderManager().initLoader(LOADER_ID_ALERT, null, this);
                 }
             } else{
                 // comes from search suggestion, query to db
@@ -257,8 +265,13 @@ public class DealDetailFragment extends DialogFragment implements
                         .getEditableText().toString();
                 String price = ((EditText) textEntryView.findViewById(R.id.edit_text_add_alert_price))
                         .getEditableText().toString();
-                //Toast.makeText(getActivity(), text, Toast.LENGTH_LONG).show();
-                new AddAlertTask().execute(email, price, AddAlertTask.ACTION_SET);
+
+                Intent service = new Intent(getActivity(), DealsAlertService.class);
+                service.putExtra(DealsAlertService.EXTRA_ALERT_EMAIL, email);
+                service.putExtra(DealsAlertService.EXTRA_ALERT_GAMEID, String.valueOf(mGameDeal.getGameID()));
+                service.putExtra(DealsAlertService.EXTRA_ALERT_PRICE, price);
+                service.putExtra(DealsAlertService.EXTRA_ALERT_ACTION, DealsAlertService.ACTION_SET);
+                getActivity().startService(service);
             }
         });
         builder.setNegativeButton(R.string.add_alert_cancel, null);
@@ -383,7 +396,7 @@ public class DealDetailFragment extends DialogFragment implements
                     null,
                     null,
                     null);
-        } else if (id == LOADER_STORE_ID) {
+        } else if (id == LOADER_ID_STORE) {
             // query store data
             return new CursorLoader(getActivity(),
                     DealsContract.StoreEntry.buildStoreUri(mGameDeal.getStoreID()),
@@ -392,6 +405,15 @@ public class DealDetailFragment extends DialogFragment implements
                     null,
                     null
             );
+        } else if (id == LOADER_ID_ALERT) {
+            Log.v(LOG_TAG, "LOADER_ID_ALERT:"+String.valueOf(mGameDeal.getGameID()));
+            // query alert for this game
+            return new CursorLoader(getActivity(),
+                    DealsContract.AlertsEntry.CONTENT_URI,
+                    null,
+                    DealsContract.AlertsEntry.COLUMN_GAME_ID + " = ?",
+                    new String[]{String.valueOf(mGameDeal.getGameID())},
+                    null);
         }
         return null;
     }
@@ -405,15 +427,22 @@ public class DealDetailFragment extends DialogFragment implements
                 mGameDeal = GameDeal.populateGameDeal(data);
 
                 // now query store name
-                getActivity().getSupportLoaderManager().initLoader(LOADER_STORE_ID, null, this);
+                getActivity().getSupportLoaderManager().initLoader(LOADER_ID_STORE, null, this);
+                getActivity().getSupportLoaderManager().initLoader(LOADER_ID_ALERT, null, this);
             }
-        } else if (id == LOADER_STORE_ID) {
+        } else if (id == LOADER_ID_STORE) {
             if (data != null && data.moveToFirst()) {
                 mStore = data.getString(0); //COLUMN_STORE_NAME
                 mStoreName.setText(mStore);
 
                 // update ui
                 setUiData(mGameDeal);
+            }
+        } else if (id == LOADER_ID_ALERT) {
+            if (data != null && data.getCount() > 0) {
+                //update toolbar
+                mHasPriceAlert = true;
+                getActivity().supportInvalidateOptionsMenu();
             }
         }
     }
@@ -446,71 +475,5 @@ public class DealDetailFragment extends DialogFragment implements
             Toast.makeText(getActivity(), R.string.intent_error, Toast.LENGTH_SHORT).show();
     }
 
-    class AddAlertTask extends AsyncTask<String, Void, Integer> {
-        public static final String ACTION_SET = "set";
-        public static final String ACTION_DELETE = "delete";
 
-        @Override
-        protected Integer doInBackground(String... params) {
-            if (params.length < 3)
-                return 0;
-
-            String email = params[0];
-            String price = params[1];
-            String action = params[2];
-
-            final String BASE_ALERT_API = "http://www.cheapshark.com/api/1.0/alerts?";
-            final String PARAMETER_ACTION = "action";
-            final String PARAMETER_EMAIL = "email";
-            final String PARAMETER_PRICE = "price";
-            final String PARAMETER_GAME_ID = "game_id";
-
-            Uri.Builder uri = Uri.parse(BASE_ALERT_API).buildUpon();
-            uri.appendQueryParameter(PARAMETER_ACTION, action);
-            uri.appendQueryParameter(PARAMETER_EMAIL, email);
-            uri.appendQueryParameter(PARAMETER_GAME_ID, String.valueOf(mGameDeal.getGameID()));
-            if (price != null)
-                uri.appendQueryParameter(PARAMETER_PRICE, price);
-
-            try {
-                URL url = new URL(uri.toString());
-                Response response = HttpRequest.doHTTPRequest(url);
-
-                // add alert to db
-                if (response.isSuccessful()) {
-                    ContentValues values = new ContentValues();
-                    values.put(DealsContract.AlertsEntry.COLUMN_GAME_ID, mGameDeal.getGameID());
-                    values.put(DealsContract.AlertsEntry.COLUMN_PRICE, mGameDeal.getSalePrice());
-                    values.put(DealsContract.AlertsEntry.COLUMN_EMAIL, email);
-                    getActivity().getContentResolver().insert(DealsContract.AlertsEntry.CONTENT_URI, values);
-
-                    String registeredEmail = PreferenceManager.getDefaultSharedPreferences(getActivity())
-                            .getString(getString(R.string.pref_email_edit_key), getString(R.string.pref_email_edit_default));
-
-                    // set preference if it wasn't set
-                    if (TextUtils.isEmpty(registeredEmail)) {
-                        PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
-                                .putString(getString(R.string.pref_email_edit_key), email)
-                                .commit();
-                    }
-
-                    Log.d(LOG_TAG, "Added price alert for:\n" +
-                            email + "\n" +
-                            mGameDeal.getGameID() + "\n" +
-                            price);
-                }
-                return response.code();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return 0;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            if (result == HttpURLConnection.HTTP_OK) {
-                Toast.makeText(getActivity(), R.string.add_alert_confirmation, Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 }
