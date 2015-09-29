@@ -6,7 +6,7 @@ import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Created by ricardo.casarez on 8/24/2015.
+ * Abstract class of RecyclerView.Adapter that contains it's data in a cursor.
  */
 public abstract class RecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
 

@@ -37,4 +37,9 @@
         android:inputType="textEmailAddress"
         android:summary="@string/pref_email_edit_summary"
         />
+    <Preference
+        android:key="@string/pref_clear_alerts"
+        android:title="@string/pref_clear_alerts_title"
+        android:summary="@string/pref_clear_alerts_summary"
+        />
 </PreferenceScreen>

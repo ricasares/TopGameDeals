@@ -23,13 +23,13 @@ import com.ricardocasarez.topgamedeals.data.DealsContract;
 import com.ricardocasarez.topgamedeals.model.GameDeal;
 
 /**
- * Created by ricardo.casarez on 8/17/2015.
+ * Fragment used to display deals as a list or grid.
  */
 public class DealsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         GameDealRecyclerViewAdapter.CustomItemClickListener {
 
     private static final String LOG_TAG = DealsFragment.class.getSimpleName();
-    public static final String FRAGMENT_DEALS_ARGUMENT_POSITION = "args_top_frag_position";
+    public static final String FRAGMENT_DEALS_ARGUMENT_STORE_ID = "args_top_frag_position";
     private static final int LOADER_ID = 200;
 
     // Projection of information retrieved from db
@@ -67,12 +67,12 @@ public class DealsFragment extends Fragment implements LoaderManager.LoaderCallb
 
     /**
      * Creates a new instance of DealsFragment with arguments
-     * @param position
-     * @return
+     * @param storeID id of the store
+     * @return instance of fragment with store id as argument
      */
-    public static DealsFragment newInstance(int position) {
+    public static DealsFragment newInstance(int storeID) {
         Bundle arguments = new Bundle();
-        arguments.putInt(FRAGMENT_DEALS_ARGUMENT_POSITION, position);
+        arguments.putInt(FRAGMENT_DEALS_ARGUMENT_STORE_ID, storeID);
 
         DealsFragment f = new DealsFragment();
         f.setArguments(arguments);
@@ -95,7 +95,7 @@ public class DealsFragment extends Fragment implements LoaderManager.LoaderCallb
 
         // get store id
         mStoreID = getArguments() != null ?
-                getArguments().getInt(FRAGMENT_DEALS_ARGUMENT_POSITION) : 1;
+                getArguments().getInt(FRAGMENT_DEALS_ARGUMENT_STORE_ID) : 1;
     }
 
     @Override
@@ -159,7 +159,7 @@ public class DealsFragment extends Fragment implements LoaderManager.LoaderCallb
     ----------- LoaderManager.LoaderCallbacks
      */
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
             return new CursorLoader(getActivity(),
                     DealsContract.GameDealEntry.CONTENT_URI,
@@ -172,7 +172,7 @@ public class DealsFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished "+loader.getId());
 
         mProgressBar.setVisibility(View.GONE);
@@ -180,7 +180,7 @@ public class DealsFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset "+loader.getId());
         mGameAdapter.changeCursor(null);
     }

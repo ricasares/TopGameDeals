@@ -12,13 +12,12 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.ricardocasarez.topgamedeals.R;
-import com.ricardocasarez.topgamedeals.SearchableActivity;
 import com.ricardocasarez.topgamedeals.view.DealsFragment;
 import com.ricardocasarez.topgamedeals.view.SearchableFragment;
 import com.squareup.picasso.Picasso;
 
 /**
- * Created by ricardo.casarez on 8/17/2015.
+ * RecyclerView Adapter set the data into views to show the deals.
  */
 public class GameDealRecyclerViewAdapter extends RecyclerViewAdapter<GameDealRecyclerViewAdapter.ViewHolder> {
     // Adapter support two types of item view.
@@ -86,7 +85,7 @@ public class GameDealRecyclerViewAdapter extends RecyclerViewAdapter<GameDealRec
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mItemClickListener.onItemClick(v, viewHolder.getPosition());
+                mItemClickListener.onItemClick(v, viewHolder.getAdapterPosition());
             }
         });
 
@@ -129,6 +128,6 @@ public class GameDealRecyclerViewAdapter extends RecyclerViewAdapter<GameDealRec
      * Public interface to callback click events.
      */
     public interface CustomItemClickListener {
-        public void onItemClick(View v, int position);
+        void onItemClick(View v, int position);
     }
 }

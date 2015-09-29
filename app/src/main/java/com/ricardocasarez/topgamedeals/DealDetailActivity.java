@@ -8,7 +8,7 @@ import com.ricardocasarez.topgamedeals.model.GameDeal;
 import com.ricardocasarez.topgamedeals.view.DealDetailFragment;
 
 /**
- * Created by ricardo.casarez on 8/24/2015.
+ * Activity that hosts DealDetailFragment to show deal details.
  */
 public class DealDetailActivity extends AppCompatActivity {
 
@@ -22,7 +22,6 @@ public class DealDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.activity_deal_detail_title);
-        getSupportActionBar().setElevation(20f);
 
         // find fragment
         DealDetailFragment fragment = (DealDetailFragment) getSupportFragmentManager()

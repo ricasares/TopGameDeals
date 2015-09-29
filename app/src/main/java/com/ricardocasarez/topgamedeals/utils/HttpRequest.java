@@ -32,8 +32,7 @@ public class HttpRequest {
                 .url(url)
                 .build();
 
-        Response response = sOkHttpClient.newCall(request).execute();
-        return response;
+        return sOkHttpClient.newCall(request).execute();
     }
 
     /**

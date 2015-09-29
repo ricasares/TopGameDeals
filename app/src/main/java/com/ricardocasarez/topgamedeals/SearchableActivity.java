@@ -14,7 +14,7 @@ import com.ricardocasarez.topgamedeals.view.FragmentInteractionListener;
 import com.ricardocasarez.topgamedeals.view.SearchableFragment;
 
 /**
- * Created by ricardo.casarez on 8/26/2015.
+ * Activity that receives the search query.
  */
 public class SearchableActivity extends AppCompatActivity implements FragmentInteractionListener {
     private static final String LOG_TAG = SearchableActivity.class.getSimpleName();
@@ -30,7 +30,6 @@ public class SearchableActivity extends AppCompatActivity implements FragmentInt
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.activity_searchable_title);
-        getSupportActionBar().setElevation(20f);
 
         handleIntent(getIntent());
     }

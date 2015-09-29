@@ -18,9 +18,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -34,8 +34,6 @@ import com.ricardocasarez.topgamedeals.model.Store;
 import com.ricardocasarez.topgamedeals.utils.HttpRequest;
 import com.ricardocasarez.topgamedeals.view.DealDetailFragment;
 import com.squareup.okhttp.Response;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.json.JSONException;
 
@@ -86,7 +84,8 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
             if (storesResponse != null && storesResponse.isSuccessful()) {
                 getStoreDataFromJson(storesResponse.body().string());
             } else {
-                Log.e(LOG_TAG, storesResponse.message() + " : " + storesResponse.code());
+                if (storesResponse != null)
+                    Log.e(LOG_TAG, storesResponse.message() + " : " + storesResponse.code());
                 return;
             }
 
@@ -122,9 +121,7 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 Log.e(LOG_TAG, dealsResponse.message());
             }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
     }
@@ -223,7 +220,7 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
 
         if (dealsList != null) {
             int size = dealsList.size();
-            ArrayList<ContentValues> contentValues = new ArrayList<ContentValues>();
+            ArrayList<ContentValues> contentValues = new ArrayList<>();
 
             // get time
             Time time = new Time();
@@ -301,7 +298,7 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
 
         if (storesList != null) {
             int size = storesList.size();
-            ArrayList<ContentValues> contentValues = new ArrayList<ContentValues>();
+            ArrayList<ContentValues> contentValues = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 Store store = storesList.get(i);
                 int storeID = store.getId();
@@ -339,7 +336,7 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
                 Boolean.parseBoolean(context.getString(R.string.pref_notifications_default)));
 
         if (displayNotification) {
-            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS || true) {
+            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
                 Log.i(LOG_TAG, "searching for price alerts to notify");
 
                 // query for price alerts, get only column id and price
@@ -422,9 +419,9 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Builds and send the notification with the provided data
-     * @param title
-     * @param content
-     * @param deal
+     * @param title Title of the notification
+     * @param content Body of the notification
+     * @param deal  GameDeal to be passed as extra.
      * @param icon if null large icon won't be set.
      */
     public void buildNotification(String title, String content, GameDeal deal, Bitmap icon) {

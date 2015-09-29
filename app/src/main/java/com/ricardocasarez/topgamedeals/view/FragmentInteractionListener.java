@@ -3,8 +3,8 @@ package com.ricardocasarez.topgamedeals.view;
 import com.ricardocasarez.topgamedeals.model.GameDeal;
 
 /**
- * Created by ricardo.casarez on 8/24/2015.
+ * Interface to send events from Fragment to parent Activity.
  */
 public interface FragmentInteractionListener {
-    public void onGameDealClick(GameDeal deal);
+    void onGameDealClick(GameDeal deal);
 }

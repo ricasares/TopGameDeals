@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by ricardo.casarez on 8/18/2015.
+ * Helper class that defines ContentProvider path, content uri's and tables columns.
  */
 public class DealsContract {
 
@@ -94,9 +94,7 @@ public class DealsContract {
          */
         public static Uri buildGameDealWithStoreUri() {
 
-            //Uri uri = CONTENT_URI.buildUpon().appendPath(StoreEntry.COLUMN_STORE_ID).build();
-            Uri uri = CONTENT_URI.buildUpon().appendPath(PATH_STORE).build();
-            return uri;
+            return CONTENT_URI.buildUpon().appendPath(PATH_STORE).build();
         }
 
         public static final String[] ALL_COLUMNS = {
@@ -145,6 +143,18 @@ public class DealsContract {
         public static final String COLUMN_GAME_ID = "game_id";
         public static final String COLUMN_PRICE = "price";
         public static final String COLUMN_EMAIL = "email";
+
+        public static final String[] ALL_COLUMNS = {
+                _ID,
+                COLUMN_GAME_ID,
+                COLUMN_PRICE,
+                COLUMN_EMAIL,
+        };
+
+        public static final int ALL_COL_ID = 0;
+        public static final int ALL_COL_GAME_ID = 1;
+        public static final int ALL_COL_PRICE = 2;
+        public static final int ALL_COL_EMAIL = 3;
 
         /**
          * Builds a store URI with the specified id appended.

@@ -8,7 +8,7 @@ import com.ricardocasarez.topgamedeals.data.DealsContract.GameDealEntry;
 import com.ricardocasarez.topgamedeals.data.DealsContract.AlertsEntry;
 
 /**
- * Created by ricardo.casarez on 8/18/2015.
+ * Database helper for create and execute database operations.
  */
 public class DbHelper extends SQLiteOpenHelper {
 

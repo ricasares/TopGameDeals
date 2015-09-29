@@ -6,7 +6,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * Created by ricardo.casarez on 9/23/2015.
+ * A bound Service that instantiates the authenticator
+ * when started.
  */
 public class DealsAuthenticatorService extends Service {
 

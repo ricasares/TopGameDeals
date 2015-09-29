@@ -3,7 +3,9 @@ package com.ricardocasarez.topgamedeals.service;
 import android.app.IntentService;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,11 +20,10 @@ import com.ricardocasarez.topgamedeals.utils.HttpRequest;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by ricardo.casarez on 9/28/2015.
+ * Service used to subscribe and un-subscribe to price alerts.
  */
 public class DealsAlertService extends IntentService{
     private static final String LOG_TAG = DealsAlertService.class.getSimpleName();
@@ -32,7 +33,7 @@ public class DealsAlertService extends IntentService{
     public static final String EXTRA_ALERT_EMAIL = "extra_email";
     public static final String EXTRA_ALERT_ACTION = "extra_action";
     public static final String EXTRA_ALERT_PRICE = "extra_price";
-    public static final String EXTRA_ALERT_GAMEID = "extra_gameid";
+    public static final String EXTRA_ALERT_GAME_ID = "extra_game_id";
 
     public DealsAlertService() {
         super(LOG_TAG);
@@ -49,7 +50,7 @@ public class DealsAlertService extends IntentService{
         String email = intent.getStringExtra(EXTRA_ALERT_EMAIL);
         String action = intent.getStringExtra(EXTRA_ALERT_ACTION);
         String price = intent.getStringExtra(EXTRA_ALERT_PRICE);
-        String gameId = intent.getStringExtra(EXTRA_ALERT_GAMEID);
+        String gameId = intent.getStringExtra(EXTRA_ALERT_GAME_ID);
 
         Uri.Builder uri = Uri.parse(BASE_ALERT_API).buildUpon();
         uri.appendQueryParameter(PARAMETER_ACTION, action);
@@ -103,9 +104,7 @@ public class DealsAlertService extends IntentService{
                             price);
                 }
             }
-        }catch (MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }catch (IOException e) {
+        } catch (IOException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
     }
@@ -119,5 +118,62 @@ public class DealsAlertService extends IntentService{
                 Toast.makeText(DealsAlertService.this, R.string.add_alert_confirmation, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Clear all price alerts from db and un-subscribe from cheapshark.
+     * Execute code in worker thread.
+     *
+     * @param context Context instance.
+     */
+    public static void clearAndUnsubscribePrceAlerts(final Context context) {
+
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Cursor cursor = context.getContentResolver().query(DealsContract.AlertsEntry.CONTENT_URI,
+                        DealsContract.AlertsEntry.ALL_COLUMNS,
+                        null,
+                        null,
+                        null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        String email = cursor.getString(DealsContract.AlertsEntry.ALL_COL_EMAIL);
+                        String gameId = cursor.getString(DealsContract.AlertsEntry.ALL_COL_GAME_ID);
+
+                        Intent intent = new Intent(context, DealsAlertService.class);
+                        intent.putExtra(EXTRA_ALERT_GAME_ID, gameId);
+                        intent.putExtra(EXTRA_ALERT_EMAIL, email);
+                        intent.putExtra(EXTRA_ALERT_ACTION, ACTION_DELETE);
+                        context.startService(intent);
+
+                    }while(cursor.moveToNext());
+                    cursor.close();
+                }
+            }
+        };
+        performOnBackgroundThread(runnable);
+    }
+
+    /**
+     * Executes the network requests on a separate thread.
+     *
+     * @param runnable The runnable instance containing network mOperations to
+     *        be executed.
+     */
+    public static Thread performOnBackgroundThread(final Runnable runnable) {
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } finally {
+
+                }
+            }
+        };
+        t.start();
+        return t;
     }
 }

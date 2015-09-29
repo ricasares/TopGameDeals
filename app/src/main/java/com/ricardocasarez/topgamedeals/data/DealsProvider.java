@@ -11,15 +11,11 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by ricardo.casarez on 8/18/2015.
+ * Content provider used to encapsulate data and provide it trough the single ContentResolver interface.
  */
 public class DealsProvider extends ContentProvider{
 
@@ -56,7 +52,6 @@ public class DealsProvider extends ContentProvider{
         return true;
     }
 
-    @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
@@ -124,8 +119,6 @@ public class DealsProvider extends ContentProvider{
                 break;
             }
             case DEAL_SUGGESTION: {
-
-                String query = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selectionArgs[0])) {
                     return null;
                 }
@@ -271,7 +264,7 @@ public class DealsProvider extends ContentProvider{
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
 
-        int rowsDeleted = 0;
+        int rowsDeleted;
         if (selection == null) selection="1";
         switch (match) {
             case STORE: {
@@ -306,7 +299,7 @@ public class DealsProvider extends ContentProvider{
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
 
-        int rowsUpdated = 0;
+        int rowsUpdated;
         if (selection == null) selection = "1";
         switch (match) {
             case STORE:

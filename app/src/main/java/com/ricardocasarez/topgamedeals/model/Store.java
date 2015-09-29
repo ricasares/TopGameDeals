@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import com.ricardocasarez.topgamedeals.data.DealsContract;
 
 /**
- * Created by ricardo.casarez on 9/17/2015.
+ * * GameDeal object used to parse json store data
  */
 public class Store implements Parcelable {
     @SerializedName("storeID")

@@ -43,7 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by ricardo.casarez on 9/22/2015.
+ * Fragment that search and display results.
+ * Query to search is passed by SearchableActivity
  */
 public class SearchableFragment extends Fragment implements
         GameDealRecyclerViewAdapter.CustomItemClickListener,
@@ -195,7 +196,9 @@ public class SearchableFragment extends Fragment implements
                     new GetDataFromJSONTask().execute(srtResponse);
                 }
             });
-        }catch(Exception e){}
+        }catch(Exception e){
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
     }
 
     @Override
@@ -223,7 +226,7 @@ public class SearchableFragment extends Fragment implements
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-            mStoreNamesMap = new HashMap<String,String>();
+            mStoreNamesMap = new HashMap<>();
             do{
                 mStoreNamesMap.put(data.getString(0), data.getString(1));
             }while(data.moveToNext());

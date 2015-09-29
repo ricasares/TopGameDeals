@@ -3,12 +3,12 @@ package com.ricardocasarez.topgamedeals.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 /**
- * Created by ricardo.casarez on 9/18/2015.
+ * RecyclerView with auto fit for grid columns.
+ * More columns will be available for larger screens.
  */
 public class AutoFitRecyclerView extends RecyclerView {
 

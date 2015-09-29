@@ -4,10 +4,13 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -42,10 +45,12 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * Created by ricardo.casarez on 9/17/2015.
+ * Fragment used to display the deals details.
+ * For large screens it will be show as dialog.
  */
 public class DealDetailFragment extends DialogFragment implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -80,22 +85,17 @@ public class DealDetailFragment extends DialogFragment implements
     private ProgressBar mProgressBar;
     private LinearLayout mMainLayout;
 
-    // share provider
-    private ShareActionProvider mShareActionProvider;
-
     // Object used to store information to show
     private GameDeal mGameDeal;
 
-    // Store name
-    private String mStore;
     // current deal uri
     private Uri mDealUri;
     private boolean mHasPriceAlert;
 
     /**
      * Creates an instance of DealDetailFragment with GameDeal as argument.
-     * @param deal
-     * @return
+     * @param deal GameDeal object used to populate UI
+     * @return new Instance of Fragment
      */
     public static DealDetailFragment newInstance(GameDeal deal) {
         DealDetailFragment fragment = new DealDetailFragment();
@@ -110,11 +110,13 @@ public class DealDetailFragment extends DialogFragment implements
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        // destroy loaders to avoid cache issues when showing fragment as dialog
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID_STORE);
         getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID_ALERT);
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         setHasOptionsMenu(false);
@@ -163,6 +165,21 @@ public class DealDetailFragment extends DialogFragment implements
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        getContext().getContentResolver().unregisterContentObserver(mAlertContentObserver);
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        getContext().getContentResolver().registerContentObserver(
+                DealsContract.AlertsEntry.CONTENT_URI, false, mAlertContentObserver);
+
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // clean menu
         menu.clear();
@@ -177,10 +194,9 @@ public class DealDetailFragment extends DialogFragment implements
         MenuItem item = menu.findItem(R.id.action_share);
 
         // Fetch and store ShareActionProvider
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
         mShareActionProvider.setShareIntent(createShareIntent());
 
-        Log.v(LOG_TAG, "onCreateOptionsMenu");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -209,13 +225,17 @@ public class DealDetailFragment extends DialogFragment implements
      * @return true if additional information is required
      */
     private boolean isAdditionalInfoRequired(GameDeal deal) {
-        if (deal == null)   return true;
-        if (deal.getReleaseDate() <= 0) return true;
-        if (TextUtils.isEmpty(deal.getMetacriticLink()))    return true;
-
-        return false;
+        return (deal == null || deal.getReleaseDate() <= 0 || TextUtils.isEmpty(deal.getMetacriticLink()));
     }
 
+    /**
+     * Handles fragment argument.
+     * If argument EXTRA_PARCELABLE_GAME_DEAL_OBJECT is not null, db will be query for additional
+     * data. If not UI will be refreshed.
+     * If argument EXTRA_GAME_DEAL_URI, query db to get additional data.
+     * @param arguments Fragment arguments. Expected to get EXTRA_PARCELABLE_GAME_DEAL_OBJECT or
+     *                  EXTRA_PARCELABLE_GAME_DEAL_OBJECT
+     */
     public void handleAction(Bundle arguments) {
         if (arguments != null) {
             mGameDeal = arguments.getParcelable(EXTRA_PARCELABLE_GAME_DEAL_OBJECT);
@@ -232,14 +252,16 @@ public class DealDetailFragment extends DialogFragment implements
                 }
             } else{
                 // comes from search suggestion, query to db
-                mDealUri = Uri.parse(arguments.getString(EXTRA_GAME_DEAL_URI));
+                mDealUri = Uri.parse(arguments.getString(EXTRA_PARCELABLE_GAME_DEAL_OBJECT));
                 getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
             }
         }
     }
 
-    /*
-    UNDER WORK
+    /**
+     * Shows an AlertDialog to add price alerts.
+     * User need to input email and desired price for the alert.
+     * Email will be remembered for the nex time.
      */
     public void showAddAlertDialog() {
         // get dialog view
@@ -255,7 +277,7 @@ public class DealDetailFragment extends DialogFragment implements
             emailTextView.setText(registeredEmail);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()/*, R.style.AppCompatAlertDialogStyle*/);
         builder.setTitle(R.string.add_alert_title);
         builder.setMessage(R.string.add_alert_msg);
         builder.setPositiveButton(R.string.add_alert_ok, new DialogInterface.OnClickListener() {
@@ -268,7 +290,7 @@ public class DealDetailFragment extends DialogFragment implements
 
                 Intent service = new Intent(getActivity(), DealsAlertService.class);
                 service.putExtra(DealsAlertService.EXTRA_ALERT_EMAIL, email);
-                service.putExtra(DealsAlertService.EXTRA_ALERT_GAMEID, String.valueOf(mGameDeal.getGameID()));
+                service.putExtra(DealsAlertService.EXTRA_ALERT_GAME_ID, String.valueOf(mGameDeal.getGameID()));
                 service.putExtra(DealsAlertService.EXTRA_ALERT_PRICE, price);
                 service.putExtra(DealsAlertService.EXTRA_ALERT_ACTION, DealsAlertService.ACTION_SET);
                 getActivity().startService(service);
@@ -283,7 +305,7 @@ public class DealDetailFragment extends DialogFragment implements
 
     /**
      * Set values to user interface using GameDeal object.
-     * @param deal
+     * @param deal object used to pupulate UI
      */
     public void setUiData(GameDeal deal) {
         if (deal != null) {
@@ -319,7 +341,7 @@ public class DealDetailFragment extends DialogFragment implements
 
             // release date
             long dateMilliseconds = deal.getReleaseDate() * 1000l;
-            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
             sdf.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
 
             String formattedDate = sdf.format(new Date(dateMilliseconds));
@@ -365,20 +387,13 @@ public class DealDetailFragment extends DialogFragment implements
             return null;
 
         int savings = (int) mGameDeal.getSavings();
-        String formatedSavings = String.format(getResources().getString(R.string.format_savings), savings);
-
-        StringBuilder contentBuilder = new StringBuilder(mGameDeal.getGameTitle());
-        contentBuilder.append(" ");
-        contentBuilder.append(formatedSavings);
-        contentBuilder.append("\n");
-
-        contentBuilder.append(REDIRECT_BASE_API);
-        contentBuilder.append(REDIRECT_DEAL_ID);
-        contentBuilder.append(mGameDeal.getDealID());
+        String formattedSavings = String.format(getResources().getString(R.string.format_savings), savings);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, contentBuilder.toString());
+
+        String content = mGameDeal.getGameTitle() + " " + formattedSavings + "\n" + REDIRECT_BASE_API + REDIRECT_DEAL_ID + mGameDeal.getDealID();
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content);
 
         return shareIntent;
     }
@@ -432,7 +447,7 @@ public class DealDetailFragment extends DialogFragment implements
             }
         } else if (id == LOADER_ID_STORE) {
             if (data != null && data.moveToFirst()) {
-                mStore = data.getString(0); //COLUMN_STORE_NAME
+                String mStore = data.getString(0); //COLUMN_STORE_NAME
                 mStoreName.setText(mStore);
 
                 // update ui
@@ -440,7 +455,7 @@ public class DealDetailFragment extends DialogFragment implements
             }
         } else if (id == LOADER_ID_ALERT) {
             if (data != null && data.getCount() > 0) {
-                //update toolbar
+                //update options menu
                 mHasPriceAlert = true;
                 getActivity().supportInvalidateOptionsMenu();
             }
@@ -457,15 +472,11 @@ public class DealDetailFragment extends DialogFragment implements
     public void onClick(View v) {
         int id = v.getId();
         Uri uri = null;
+
         if (id == R.id.button_store) {
-            StringBuilder redirectURL = new StringBuilder(REDIRECT_BASE_API);
-            redirectURL.append("dealID=" + mGameDeal.getDealID());
-            uri = Uri.parse(redirectURL.toString());
+            uri = Uri.parse(REDIRECT_BASE_API + "dealID=" + mGameDeal.getDealID());
         } else if (id == R.id.button_metacritic) {
-            StringBuilder builder = new StringBuilder(METACRITIC_HOME)
-                    .append(mGameDeal.getMetacriticLink());
-            uri = Uri.parse(builder.toString());
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            uri = Uri.parse(METACRITIC_HOME + mGameDeal.getMetacriticLink());
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -475,5 +486,15 @@ public class DealDetailFragment extends DialogFragment implements
             Toast.makeText(getActivity(), R.string.intent_error, Toast.LENGTH_SHORT).show();
     }
 
+    // Observer used to listent for Alert table changes
+    final ContentObserver mAlertContentObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
 
+            //update toolbar
+            mHasPriceAlert = true;
+            getActivity().supportInvalidateOptionsMenu();
+        }
+    };
 }

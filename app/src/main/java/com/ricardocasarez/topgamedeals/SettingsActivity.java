@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 import com.ricardocasarez.topgamedeals.view.SettingsFragment;
 
 /**
- * Created by ricardo.casarez on 9/11/2015.
+ * Activity that hosts SettingsFragment to display settings page.
  */
 public class SettingsActivity extends AppCompatActivity {
     @Override
@@ -20,7 +20,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.activity_settings_title);
-        getSupportActionBar().setElevation(20f);
 
         SettingsFragment fragment = (SettingsFragment) getSupportFragmentManager()
                 .findFragmentByTag(SettingsFragment.TAG);

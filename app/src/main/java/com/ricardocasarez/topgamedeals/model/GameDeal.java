@@ -7,10 +7,8 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 import com.ricardocasarez.topgamedeals.data.DealsContract;
 
-import java.util.List;
-
 /**
- * Created by ricardo.casarez on 8/25/2015.
+ * GameDeal object used to parse json deal data
  */
 public class GameDeal implements Parcelable {
 

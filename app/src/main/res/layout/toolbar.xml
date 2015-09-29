@@ -6,4 +6,5 @@
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     app:layout_scrollFlags="scroll|enterAlways"
-    android:theme="@style/MyThemeOverlay.ActionBar" />
+    android:theme="@style/MyThemeOverlay.ActionBar"
+    android:elevation="5dp"/>

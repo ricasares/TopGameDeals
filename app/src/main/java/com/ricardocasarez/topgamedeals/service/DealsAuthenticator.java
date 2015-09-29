@@ -8,7 +8,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 /**
- * Created by ricardo.casarez on 9/23/2015.
+ * Authenticator needed by the sync adapter framework.
+ * This component plugs into the Android accounts and authentication framework and provides a
+ * standard interface for handling user credentials such as login information
  */
 public class DealsAuthenticator extends AbstractAccountAuthenticator {
 

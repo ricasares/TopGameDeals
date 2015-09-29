@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
         // set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // elevation is set to AppBarLayout instead.
+        getSupportActionBar().setElevation(0);
 
         // initialize viewpager adapter with null data
         mSectionsPagerAdapter = new StatePagerAdapter(getSupportFragmentManager(), null);

@@ -6,13 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.ricardocasarez.topgamedeals.data.DealsContract;
-import com.ricardocasarez.topgamedeals.model.Store;
 import com.ricardocasarez.topgamedeals.view.DealsFragment;
 
-import java.util.List;
-
 /**
- * Created by ricardo.casarez on 8/17/2015.
+ * Adapter to show the store titles in TabLayout and generates Fragments to show deals for each store.
  */
 public class StatePagerAdapter extends FragmentStatePagerAdapter {
 
@@ -52,8 +49,7 @@ public class StatePagerAdapter extends FragmentStatePagerAdapter {
             return null;
 
         // get store name
-        String storeName = mCursor.getString(DealsContract.StoreEntry.ALL_COL_STORE_NAME);
-        return storeName;
+        return mCursor.getString(DealsContract.StoreEntry.ALL_COL_STORE_NAME);
     }
 
     /**
