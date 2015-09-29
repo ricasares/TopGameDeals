@@ -139,7 +139,7 @@ public class DealDetailFragment extends DialogFragment implements
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         mMainLayout = (LinearLayout) view.findViewById(R.id.details_layout);
         // hide content until is loaded
-        mMainLayout.setVisibility(View.GONE);
+        mMainLayout.setVisibility(View.INVISIBLE);
 
         // set up imageview
         mImageView = (ImageView) view.findViewById(R.id.imageview_art);

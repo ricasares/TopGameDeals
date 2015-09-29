@@ -84,8 +84,6 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
             if (storesResponse != null && storesResponse.isSuccessful()) {
                 getStoreDataFromJson(storesResponse.body().string());
             } else {
-                if (storesResponse != null)
-                    Log.e(LOG_TAG, storesResponse.message() + " : " + storesResponse.code());
                 return;
             }
 
@@ -118,8 +116,6 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
             Response dealsResponse = HttpRequest.doHTTPRequest(url);
             if (dealsResponse != null && dealsResponse.isSuccessful()) {
                 getDealsFromJSON(dealsResponse.body().string());
-            } else {
-                Log.e(LOG_TAG, dealsResponse.message());
             }
         } catch (IOException | JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -362,7 +358,9 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
                                         DealsContract.GameDealEntry.COLUMN_DEAL_ID,
                                         DealsContract.GameDealEntry.COLUMN_GAME_TITLE,
                                         DealsContract.GameDealEntry.COLUMN_PRICE,
-                                        DealsContract.GameDealEntry.COLUMN_THUMB
+                                        DealsContract.GameDealEntry.COLUMN_THUMB,
+                                        DealsContract.GameDealEntry._ID,
+
                                 },
                                 DealsContract.GameDealEntry.COLUMN_GAME_ID + " = ? AND " +
                                         DealsContract.GameDealEntry.COLUMN_PRICE + " < ?",
@@ -376,22 +374,12 @@ public class DealsSyncAdapter extends AbstractThreadedSyncAdapter {
                             deal.setGameTitle(dealsCursor.getString(1)); //COLUMN_GAME_TITLE
                             deal.setSalePrice(dealsCursor.getFloat(2));  //COLUMN_PRICE
                             deal.setThumbUrl(dealsCursor.getString(3)); //COLUMN_THUMB
+                            deal.setId(dealsCursor.getInt(4)); //_ID
                             prepareNotification(deal);
+
+                            dealsCursor.close();
                         }
                     } while (alertsCursor.moveToNext());
-
-                    // find any deal with
-                    final String selection = DealsContract.GameDealEntry.COLUMN_GAME_ID + " = ? AND " +
-                            DealsContract.GameDealEntry.COLUMN_PRICE + " < ?";
-                    final String[] selectionArgs = {};
-                    context.getContentResolver().query(
-                            DealsContract.GameDealEntry.CONTENT_URI,
-                            null,
-                            selection,
-                            selectionArgs,
-                            null
-                    );
-
                     alertsCursor.close();
                 } else
                     Log.w(LOG_TAG, "cannot find any alert in db");
