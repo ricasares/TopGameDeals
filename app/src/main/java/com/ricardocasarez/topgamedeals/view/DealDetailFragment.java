@@ -252,7 +252,7 @@ public class DealDetailFragment extends DialogFragment implements
                 }
             } else{
                 // comes from search suggestion, query to db
-                mDealUri = Uri.parse(arguments.getString(EXTRA_PARCELABLE_GAME_DEAL_OBJECT));
+                mDealUri = Uri.parse(arguments.getString(EXTRA_GAME_DEAL_URI));
                 getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
             }
         }

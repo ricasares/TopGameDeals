@@ -71,10 +71,16 @@ public class GameDealRecyclerViewAdapter extends RecyclerViewAdapter<GameDealRec
 
         // old price
         float oldPrice = cursor.getFloat(DealsFragment.COL_OLD_PRICE);
-        String formattedOldPrice = String.format(getContext().getString(R.string.format_price), oldPrice);
-        viewHolder.textViewOldPrice.setText(formattedOldPrice);
-        viewHolder.textViewOldPrice.setPaintFlags(
-        viewHolder.textViewOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        if (price != oldPrice) {
+            String formattedOldPrice = String.format(getContext().getString(R.string.format_price), oldPrice);
+            viewHolder.textViewOldPrice.setVisibility(View.VISIBLE);
+            viewHolder.textViewOldPrice.setText(formattedOldPrice);
+            viewHolder.textViewOldPrice.setPaintFlags(
+                    viewHolder.textViewOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            // hide old price
+            viewHolder.textViewOldPrice.setVisibility(View.GONE);
+        }
     }
 
     @Override
